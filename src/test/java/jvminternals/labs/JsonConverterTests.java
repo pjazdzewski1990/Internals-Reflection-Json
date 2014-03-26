@@ -58,12 +58,6 @@ public class JsonConverterTests {
 		assertEquals(tc.bool, fixtures.bool);
 	}
 
-	private String makeTestString(TestClass target) {
-		
-		return "{string: \"" + target.string + "\", integer: " + target.integer + 
-				", object: {}, array: "+ target.array +", bool: " + target.bool + "}";
-	}
-
 	@Test
 	public void testToJson() throws JsonConverterException {
 		
@@ -75,5 +69,62 @@ public class JsonConverterTests {
 		assertNotEquals(stringified,"");
 		
 		assertEquals(makeTestString(fixtures), stringified);
+	}
+	
+	@Test
+	public void privateFieldToJson() throws JsonConverterException {
+		
+		class Private{
+			private int field1 = 1;
+			private int field2 = 2;
+		}
+		
+		Private privateFieldsObject = new Private();
+		
+		JsonConverterInterface json = new JsonConverter();
+		String stringified = json.toJson(privateFieldsObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{}", stringified);
+	}
+	
+	@Test
+	public void missingFieldToJson() throws JsonConverterException {
+		
+		class Nullable{
+			public Integer field1 = null;
+			public List field2 = null;
+			public int field3 = 3;
+		}
+		
+		Nullable nullableFieldsObject = new Nullable();
+		
+		JsonConverterInterface json = new JsonConverter();
+		String stringified = json.toJson(nullableFieldsObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{field1: null, field2: null, field3: 3}", stringified);
+	}
+	
+	@Test
+	public void arrayFieldToJson() throws JsonConverterException {
+		//TODO: works only with Integer[] not int[]. Reason -> cast issues  
+		class WithArrayField{
+			public Integer[] field = new Integer[]{1,2,3};
+		}
+		
+		WithArrayField nullableFieldsObject = new WithArrayField();
+		
+		JsonConverterInterface json = new JsonConverter();
+		String stringified = json.toJson(nullableFieldsObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{field: [1, 2, 3]}", stringified);
+	}
+	
+	private String makeTestString(TestClass target) {
+		
+		return "{string: \"" + target.string + "\", integer: " + target.integer + 
+				", object: " + target.object + ", array: "+ target.array +", bool: " + target.bool + "}";
 	}
 }

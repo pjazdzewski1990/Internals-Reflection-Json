@@ -2,9 +2,7 @@ package jvminternals.labs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 public class JsonConverter implements JsonConverterInterface {
 
@@ -50,12 +48,13 @@ public class JsonConverter implements JsonConverterInterface {
 			return "\"" + toWrite.toString() + "\"";
 		}
 		//TODO:
-		if(toWrite.getClass().isArray()){
+		if(toWrite instanceof Collection){
 			//let combineList handle this
-			toWrite = Arrays.asList(toWrite);
+			Collection toWriteList = (Collection) toWrite;
+			toWrite = toWriteList.toArray();
 		}
-		if(toWrite instanceof List){
-			return combineList((List)toWrite);
+		if(toWrite.getClass().isArray()){
+			return combineArray((Object[])toWrite);
 		}
 		if(toWrite instanceof Object){
 			return toJson(toWrite);
@@ -64,15 +63,15 @@ public class JsonConverter implements JsonConverterInterface {
 		throw new JsonConverterException("No writable form for " + toWrite);
 	}
 
-	private String combineList(List toWrite) throws JsonConverterException {
+	private String combineArray(Object[] toWrite) throws JsonConverterException {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("[");
-		for(int i=0; i<toWrite.size(); i++){
-			Object obj = toWrite.get(i);
+		for(int i=0; i<toWrite.length; i++){
+			Object obj = toWrite[i];
 			sb.append(toWritableForm(obj));
 			
-			if(i!=toWrite.size()-1){
+			if(i!=toWrite.length-1){
 				sb.append(", ");
 			}
 		}

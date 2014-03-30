@@ -3,7 +3,9 @@ package jvminternals.labs;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,13 +19,7 @@ class TestClass {
 	
 	public TestClass() { }
 }
-class Dummy{
-	//TODO: fix this hack
-	@Override
-	public String toString(){
-		return "{}";
-	}
-}
+class Dummy { }
 
 public class JsonConverterTests {
 
@@ -63,8 +59,6 @@ public class JsonConverterTests {
 		
 		JsonConverterInterface json = new JsonConverter();
 		String stringified = json.toJson(fixtures);
-		System.out.println("ToJson  is " + stringified);
-		System.out.println("Fixture is " + makeTestString(fixtures));
 		assertNotNull(stringified);
 		assertNotEquals(stringified,"");
 		
@@ -108,7 +102,7 @@ public class JsonConverterTests {
 	
 	@Test
 	public void arrayFieldToJson() throws JsonConverterException {
-		//TODO: works only with Integer[] not int[]. Reason -> cast issues  
+		//TODO: works only with Integer[] not int[]. Reason -> cast issues
 		class WithArrayField{
 			public Integer[] field = new Integer[]{1,2,3};
 		}
@@ -122,9 +116,30 @@ public class JsonConverterTests {
 		assertEquals("{field: [1, 2, 3]}", stringified);
 	}
 	
+	@Test
+	public void mapFieldToJson() throws JsonConverterException {
+		class WithMapField{
+			public Map<Integer, String> field = new HashMap<>();
+			WithMapField(){
+				field.put(1, "jeden");
+				field.put(2, "dwa");
+			}
+		}
+		
+		WithMapField nullableFieldsObject = new WithMapField();
+		
+		JsonConverterInterface json = new JsonConverter();
+		String stringified = json.toJson(nullableFieldsObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{field: {1: \"jeden\", 2: \"dwa\"}}", stringified);
+	}
+	
+	/// --- helpers
+	
 	private String makeTestString(TestClass target) {
 		
 		return "{string: \"" + target.string + "\", integer: " + target.integer + 
-				", object: " + target.object + ", array: "+ target.array +", bool: " + target.bool + "}";
+				", object: " + "{}" + ", array: "+ target.array +", bool: " + target.bool + "}";
 	}
 }

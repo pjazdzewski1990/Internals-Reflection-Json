@@ -3,6 +3,7 @@ package jvminternals.labs;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Map;
 
 public class JsonConverter implements JsonConverterInterface {
 
@@ -47,7 +48,7 @@ public class JsonConverter implements JsonConverterInterface {
 		if(toWrite instanceof String){
 			return "\"" + toWrite.toString() + "\"";
 		}
-		//TODO:
+		//TODO: objects vs primitives
 		if(toWrite instanceof Collection){
 			//let combineList handle this
 			Collection toWriteList = (Collection) toWrite;
@@ -56,12 +57,30 @@ public class JsonConverter implements JsonConverterInterface {
 		if(toWrite.getClass().isArray()){
 			return combineArray((Object[])toWrite);
 		}
+		if(toWrite instanceof Map){
+			return combineMap((Map)toWrite);
+		}
 		if(toWrite instanceof Object){
 			return toJson(toWrite);
 		}
 		System.out.println("No writable form for " + toWrite);
 		throw new JsonConverterException("No writable form for " + toWrite);
 	}
+
+	private String combineMap(Map map) throws JsonConverterException {
+		StringBuilder sb = new StringBuilder("{");
+		for (Object keyAndValue : map.entrySet()) {
+			Map.Entry entry = (Map.Entry) keyAndValue;
+			sb.append(toWritableForm(entry.getKey()));
+			sb.append(": ");
+			sb.append(toWritableForm(entry.getValue()));
+			sb.append(", ");
+		}
+		sb.delete(sb.length()-2, sb.length());
+		sb.append("}");
+		return sb.toString();
+	}
+
 
 	private String combineArray(Object[] toWrite) throws JsonConverterException {
 		StringBuilder sb = new StringBuilder();

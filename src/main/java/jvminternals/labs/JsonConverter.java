@@ -13,17 +13,34 @@ public class JsonConverter implements JsonConverterInterface {
 			throw new JsonConverterException("null object converion");
 		}
 
-		StringBuilder jsonBuilder = new StringBuilder("{");
-		Field[] allFields = obj.getClass().getFields();
+		//Class objClass = obj.getClass();
 		
+		StringBuilder jsonBuilder = new StringBuilder("{");
+		jsonBuilder.append( extractObjectFields(obj, obj.getClass()) );
+		jsonBuilder.append(", ");
+		jsonBuilder.delete(jsonBuilder.length()-2, jsonBuilder.length());
+		jsonBuilder.append("}");
+		
+		return jsonBuilder.toString();
+	}
+
+
+	private <T> StringBuilder extractObjectFields(T obj, Class objClass)
+			throws JsonConverterException {
+		
+		Field[] allFields = objClass.getFields();
+
+		StringBuilder jsonBuilder = new StringBuilder();
 		for (int i=0; i<allFields.length; i++) {
 			Field field = allFields[i]; 
 			try {
+				jsonBuilder.append("\"");
 				jsonBuilder.append(field.getName());
+				jsonBuilder.append("\"");
 				jsonBuilder.append(": ");
 				jsonBuilder.append(toWritableForm(field.get(obj)));
 				
-				if(i!=allFields.length-1){
+				if(i != allFields.length - 1){
 					jsonBuilder.append(", ");
 				}
 			} catch (IllegalArgumentException e) { //ignore errors
@@ -32,9 +49,7 @@ public class JsonConverter implements JsonConverterInterface {
 				e.printStackTrace();
 			}
 		}
-		jsonBuilder.append("}");
-		
-		return jsonBuilder.toString();
+		return jsonBuilder;
 	}
 
 

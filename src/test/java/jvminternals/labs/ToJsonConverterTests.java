@@ -21,11 +21,11 @@ class TestClass {
 }
 class Dummy { }
 
-public class JsonConverterTests {
+public class ToJsonConverterTests {
 
 	TestClass fixtures;
 	
-	public JsonConverterTests(){
+	public ToJsonConverterTests(){
 		fixtures = new TestClass();
 		fixtures.string = "str";
 		fixtures.integer = 11;
@@ -97,7 +97,7 @@ public class JsonConverterTests {
 		String stringified = json.toJson(nullableFieldsObject);
 		
 		assertNotNull(stringified);
-		assertEquals("{field1: null, field2: null, field3: 3}", stringified);
+		assertEquals("{\"field1\": null, \"field2\": null, \"field3\": 3}", stringified);
 	}
 	
 	@Test
@@ -113,7 +113,7 @@ public class JsonConverterTests {
 		String stringified = json.toJson(nullableFieldsObject);
 		
 		assertNotNull(stringified);
-		assertEquals("{field: [1, 2, 3]}", stringified);
+		assertEquals("{\"field\": [1, 2, 3]}", stringified);
 	}
 	
 	@Test
@@ -126,20 +126,51 @@ public class JsonConverterTests {
 			}
 		}
 		
-		WithMapField nullableFieldsObject = new WithMapField();
+		WithMapField mapFieldObject = new WithMapField();
 		
 		JsonConverterInterface json = new JsonConverter();
-		String stringified = json.toJson(nullableFieldsObject);
+		String stringified = json.toJson(mapFieldObject);
 		
 		assertNotNull(stringified);
-		assertEquals("{field: {1: \"jeden\", 2: \"dwa\"}}", stringified);
+		assertEquals("{\"field\": {1: \"jeden\", 2: \"dwa\"}}", stringified);
+	}
+	
+	@Test
+	public void inheritedClassToJson() throws JsonConverterException {
+		class Base {
+			public int baseInt = 1;
+		}
+		class Foo extends Base {
+			public int fooInt = 2;
+		}
+		
+		Base baseObject = new Base();
+		Foo fooObject = new Foo();
+		Base fooAsBaseObject = new Foo();
+		
+		JsonConverterInterface json = new JsonConverter();
+		String stringified = json.toJson(baseObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{\"baseInt\": 1}", stringified);
+		
+		stringified = json.toJson(fooObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{\"fooInt\": 2, \"baseInt\": 1}", stringified);
+		
+		stringified = json.toJson(fooAsBaseObject);
+		
+		assertNotNull(stringified);
+		assertEquals("{\"fooInt\": 2, \"baseInt\": 1}", stringified);
 	}
 	
 	/// --- helpers
 	
 	private String makeTestString(TestClass target) {
 		
-		return "{string: \"" + target.string + "\", integer: " + target.integer + 
-				", object: " + "{}" + ", array: "+ target.array +", bool: " + target.bool + "}";
+		return "{\"string\": \"" + target.string + "\", \"integer\": " + target.integer 
+				+ ", \"object\": " + "{}" + ", \"array\": "+ target.array +", \"bool\": " + target.bool 
+				+ "}";
 	}
 }

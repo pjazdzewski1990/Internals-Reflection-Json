@@ -7,52 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-class TestClass {
-	public String string;
-	public int integer;
-	public Dummy object;
-	public List<Integer> array;
-	public boolean bool;
-	
-	public TestClass() { }
-}
-class Dummy { }
+import jvminternals.labs.fixtures.JsonTestClass;
 
 public class ToJsonConverterTests {
 
-	TestClass fixtures;
-	
-	public ToJsonConverterTests(){
-		fixtures = new TestClass();
-		fixtures.string = "str";
-		fixtures.integer = 11;
-		fixtures.object = new Dummy();
-		fixtures.array = new ArrayList<>();
-		fixtures.array.add(1);
-		fixtures.array.add(2);
-		fixtures.array.add(3);
-		fixtures.bool = false;
-	}
-
-	@Ignore // pending until fromJson is implemented
-	@Test
-	public void testFromJson() throws JsonConverterException {
-		
-		String testString = makeTestString(fixtures);
-		System.out.println("TestString is " + testString);
-		
-		JsonConverterInterface json = new JsonConverter();
-		TestClass tc = json.fromJson(testString, TestClass.class);
-		assertNotNull(tc);
-		
-		assertEquals(tc.string, fixtures.string);
-		assertEquals(tc.integer, fixtures.integer);
-		assertEquals(tc.array, fixtures.array);
-		assertEquals(tc.bool, fixtures.bool);
-	}
+	JsonTestClass fixtures = JsonTestClass.generateFixtures();
 
 	@Test
 	public void testToJson() throws JsonConverterException {
@@ -62,7 +23,7 @@ public class ToJsonConverterTests {
 		assertNotNull(stringified);
 		assertNotEquals(stringified,"");
 		
-		assertEquals(makeTestString(fixtures), stringified);
+		assertEquals(fixtures.makeTestString(), stringified);
 	}
 	
 	@Test
@@ -162,15 +123,7 @@ public class ToJsonConverterTests {
 		stringified = json.toJson(fooAsBaseObject);
 		
 		assertNotNull(stringified);
+		///TODO: what a retarded way of comparing json 
 		assertEquals("{\"fooInt\": 2, \"baseInt\": 1}", stringified);
-	}
-	
-	/// --- helpers
-	
-	private String makeTestString(TestClass target) {
-		
-		return "{\"string\": \"" + target.string + "\", \"integer\": " + target.integer 
-				+ ", \"object\": " + "{}" + ", \"array\": "+ target.array +", \"bool\": " + target.bool 
-				+ "}";
 	}
 }

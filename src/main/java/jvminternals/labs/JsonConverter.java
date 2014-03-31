@@ -12,8 +12,6 @@ public class JsonConverter implements JsonConverterInterface {
 		if (obj == null) {
 			throw new JsonConverterException("null object converion");
 		}
-
-		//Class objClass = obj.getClass();
 		
 		StringBuilder jsonBuilder = new StringBuilder("{");
 		jsonBuilder.append( extractObjectFields(obj, obj.getClass()) );

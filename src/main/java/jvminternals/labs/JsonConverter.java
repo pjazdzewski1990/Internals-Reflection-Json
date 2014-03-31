@@ -15,8 +15,6 @@ public class JsonConverter implements JsonConverterInterface {
 		
 		StringBuilder jsonBuilder = new StringBuilder("{");
 		jsonBuilder.append( extractObjectFields(obj, obj.getClass()) );
-		jsonBuilder.append(", ");
-		jsonBuilder.delete(jsonBuilder.length()-2, jsonBuilder.length());
 		jsonBuilder.append("}");
 		
 		return jsonBuilder.toString();
